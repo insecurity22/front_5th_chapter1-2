@@ -1,4 +1,4 @@
-// import { addEvent } from "./eventManager";
+import { addEvent } from "./eventManager";
 
 /**
  * [vNode -> 실제 DOM 요소로 변환]
@@ -76,4 +76,38 @@ export function createElement(vNode) {
 // [DOM attributes & event listeners]
 function updateAttributes($el, props) {
   if (!props) return;
+
+  Object.entries(props).forEach(([key, value]) => {
+    // remove attribute
+    if (value === null || value === undefined) {
+      $el.removeAttribute(key);
+      return;
+    }
+
+    // style
+    if (key === "style" && typeof value === "string") {
+      $el.style.cssText = value;
+      return;
+    }
+
+    // className
+    if (key === "className") {
+      $el.setAttribute("class", value);
+      return;
+    }
+
+    // event listener(onClick, onChange, onMouseEnter, onMouseLeave, ...)
+    if (key.startsWith("on") && typeof value === "function") {
+      const eventType = key.toLowerCase().substring(2);
+      addEvent($el, eventType, value);
+      return;
+    }
+
+    // data-* attributes
+    if (key.startsWith("data-")) {
+      $el.setAttribute(key, value);
+    } else {
+      $el[key] = value;
+    }
+  });
 }
