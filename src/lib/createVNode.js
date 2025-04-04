@@ -1,23 +1,17 @@
+/**
+  1. "div", { id: "test" }, "Hello"
+  -> VNode: { 
+    type: "div", 
+    props: { id: "test" }, 
+    children: ["Hello"] 
+  }
+ */
 export function createVNode(type, props, ...children) {
   return {
     type,
     props,
-    children: flattenChildren(children),
+    children: children
+      .flat(Infinity)
+      .filter((child) => child !== false && child != null),
   };
-}
-
-function flattenChildren(children) {
-  return children?.reduce((acc, child) => {
-    if (Array.isArray(child)) {
-      return acc.concat(flattenChildren(child));
-    }
-
-    if (child === null || child === undefined || typeof child === "boolean") {
-      return acc;
-    }
-
-    acc.push(child);
-
-    return acc;
-  }, []);
 }

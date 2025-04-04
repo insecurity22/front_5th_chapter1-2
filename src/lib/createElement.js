@@ -1,35 +1,8 @@
 import { addEvent } from "./eventManager";
 
 /**
- * [vNode -> 실제 DOM 요소로 변환]
- * 1. Array
- * [
- *   { type: 'div', props: null, children: [ '첫 번째' ] },
- *   { type: "span", props: null, children: ['두 번째'] },
- * ] -> fragment
- *
- * 2. Object
- * { type: 'div', props: null, children: [ '첫 번째' ] },
- * {
- *   type: [Function: FuncComponent],
- *   props: { text: 'Hello' },
- *   children: []
- * },
- * {
- *   type: 'ul',
- *   props: {},
- *   children: [
- *     { type: 'li', props: [Object], children: [Array] },
- *     { type: 'li', props: [Object], children: [Array] },
- *     { type: 'li', props: [Object], children: [Array] }
- *   ]
- * } -> element
- *
- * 3. Other
- * undefined, null, false, true -> textNode
- * string, number -> textNode
+  vNode -> 실제 DOM 요소로 변환
  */
-
 export function createElement(vNode) {
   if (vNode === null || vNode === undefined || typeof vNode === "boolean") {
     return document.createTextNode("");
@@ -39,36 +12,63 @@ export function createElement(vNode) {
     return document.createTextNode(vNode);
   }
 
-  const isArray = Array.isArray(vNode);
-  if (isArray) {
+  /**
+    [
+      { type: 'div', props: null, children: [ '첫 번째' ] },
+      { type: 'span', props: null, children: [ '두 번째' ] }
+    ]
+   */
+  if (Array.isArray(vNode)) {
     const fragment = document.createDocumentFragment();
-    vNode.forEach((child) => {
-      const childElement = createElement(child);
-      fragment.appendChild(childElement);
+    vNode.forEach((childVNode) => {
+      /**
+        childVNode: { 
+           type: 'div', 
+           props: null, 
+           children: [ '첫 번째' ] 
+        }
+       */
+      fragment.appendChild(createElement(childVNode));
     });
+
     return fragment;
   }
 
-  const isFunction = typeof vNode.type === "function";
-  if (isFunction) {
-    throw new Error("Function components are not supported yet");
-  }
+  const isTag = typeof vNode.type === "string";
+  if (isTag) {
+    const component = vNode.type;
+    /**
+     * div
+     * span
+     */
 
-  const isHTMLTag = typeof vNode.type === "string";
-  if (isHTMLTag) {
-    const $element = document.createElement(vNode.type);
+    const $element = document.createElement(component);
+    /**
+     * HTMLDivElement
+     * HTMLSpanElement
+     */
 
     if (vNode.props) {
       updateAttributes($element, vNode.props);
     }
 
     if (vNode.children) {
-      for (const child of vNode.children) {
+      vNode.children.forEach((child) => {
+        /**
+         * child: 텍스트
+         * child: { type: 'span', props: null, children: [ 'span 안의 텍스트' ] }
+         */
         const $childElement = createElement(child);
         $element.appendChild($childElement);
-      }
+      });
     }
 
+    return $element;
+  }
+
+  if (typeof vNode.type === "function") {
+    const component = vNode.type;
+    const $element = component();
     return $element;
   }
 }
