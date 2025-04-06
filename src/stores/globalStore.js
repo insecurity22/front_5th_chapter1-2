@@ -1,6 +1,6 @@
 import { createStore } from "../lib";
 import { userStorage } from "../storages";
-
+import { router } from "../router";
 const 초 = 1000;
 const 분 = 초 * 60;
 const 시간 = 분 * 60;
@@ -55,9 +55,17 @@ export const globalStore = createStore(
     },
     toggleLike(state, postId) {
       const { currentUser, posts } = state;
+      if (!currentUser) {
+        alert("로그인 후 이용해주세요.");
+        router.get().push("/login");
+        return;
+      }
 
       const currentPost = posts.find((post) => post.id === postId);
-      if (!currentPost) return;
+      if (!currentPost) {
+        alert("존재하지 않는 게시글입니다.");
+        return;
+      }
 
       const { username } = currentUser;
       const { likeUsers } = currentPost;
