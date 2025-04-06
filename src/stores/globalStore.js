@@ -70,5 +70,20 @@ export const globalStore = createStore(
 
       return { ...state };
     },
+    addPost(state, content) {
+      const { currentUser, posts } = state;
+
+      const newPost = {
+        author: currentUser.username,
+        time: Date.now(),
+        content,
+        likeUsers: [],
+      };
+
+      return {
+        ...state,
+        posts: [newPost, ...posts],
+      };
+    },
   },
 );
