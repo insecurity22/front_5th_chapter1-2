@@ -7,8 +7,10 @@ export const PostForm = () => {
 
   const handleCreate = (e) => {
     e.preventDefault();
-    const content = document.getElementById("post-content").value;
-    addPost(content);
+
+    const contentElement = document.getElementById("post-content");
+    addPost(contentElement.value);
+    contentElement.value = "";
   };
 
   return (
