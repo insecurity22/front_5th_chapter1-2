@@ -3,10 +3,12 @@ import { createVNode } from "../../lib";
 import { toTimeFormat } from "../../utils/index.js";
 
 export const Post = ({
+  id,
   author,
   time,
   content,
   likeUsers,
+  toggleLike,
   activationLike = false,
 }) => {
   return (
@@ -20,6 +22,7 @@ export const Post = ({
       <p>{content}</p>
       <div className="mt-2 flex justify-between text-gray-500">
         <span
+          onClick={() => toggleLike(id)}
           className={`like-button cursor-pointer${activationLike ? " text-blue-500" : ""}`}
         >
           좋아요 {likeUsers.length}
