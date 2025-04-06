@@ -1,6 +1,6 @@
 import { createStore } from "../lib";
 import { userStorage } from "../storages";
-import { router } from "../router";
+
 const 초 = 1000;
 const 분 = 초 * 60;
 const 시간 = 분 * 60;
@@ -54,43 +54,42 @@ export const globalStore = createStore(
       return { ...state, currentUser: null, loggedIn: false };
     },
     toggleLike(state, postId) {
-      const { currentUser, posts } = state;
-      if (!currentUser) {
-        alert("로그인 후 이용해주세요.");
-        router.get().push("/login");
+      const { currentUser: user, posts } = state;
+
+      if (!user) {
+        alert("로그인 후 이용해주세요");
         return;
       }
 
-      const currentPost = posts.find((post) => post.id === postId);
-      if (!currentPost) {
+      const selectedPost = posts?.find((post) => post.id === postId);
+      if (!selectedPost) {
         alert("존재하지 않는 게시글입니다.");
         return;
       }
 
-      const { username } = currentUser;
-      const { likeUsers } = currentPost;
-      const hasLiked = likeUsers.includes(username);
+      const hasLiked = selectedPost.likeUsers?.includes(user?.username);
       if (hasLiked) {
-        currentPost.likeUsers = likeUsers.filter((id) => id !== username);
+        selectedPost.likeUsers = selectedPost.likeUsers?.filter(
+          (id) => id !== user?.username,
+        );
       } else {
-        currentPost.likeUsers.push(username);
+        selectedPost.likeUsers?.push(user.username);
       }
 
       return { ...state };
     },
     addPost(state, content) {
-      const { currentUser, posts } = state;
-
       const newPost = {
-        author: currentUser.username,
+        id: state.posts?.length + 1,
         time: Date.now(),
-        content,
+        author: state.currentUser.username,
         likeUsers: [],
+        content,
       };
 
       return {
         ...state,
-        posts: [newPost, ...posts],
+        posts: [newPost, ...state.posts],
       };
     },
   },
