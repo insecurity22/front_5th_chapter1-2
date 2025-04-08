@@ -1,8 +1,8 @@
 const eventMap = new Map();
 /**
  *  Map {
- *    'button-click' => Set { function1, function2, ... },
- *    'menu-open' => Set { function3, function4, ... },
+ *    'button-click' => WeakMap { function1, function2, ... },
+ *    'menu-open' => WeakMap { function3, function4, ... },
  *    ...
  *  }
  */
@@ -40,8 +40,19 @@ export function addEvent(element, eventType, handler) {
   eventMap.get(eventType).set(element, handler);
 }
 
-export function removeEvent(element, eventType) {
+export function removeEvent(element, eventType, handler) {
   if (!eventMap.has(eventType)) return;
 
-  eventMap.get(eventType).delete(element);
+  if (handler) {
+    const handlers = eventMap.get(eventType);
+    const currentHandler = handlers.get(element);
+
+    // 현재 저장된 핸들러와 삭제하려는 핸들러가 일치하는 경우에만 삭제
+    if (currentHandler === handler) {
+      handlers.delete(element);
+    }
+  } else {
+    // 핸들러가 제공되지 않은 경우, 해당 요소의 이벤트 타입 관련 모든 핸들러 제거
+    eventMap.get(eventType).delete(element);
+  }
 }
