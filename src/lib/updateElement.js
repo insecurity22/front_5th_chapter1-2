@@ -27,7 +27,7 @@ function updateAttributes(target, originNewProps, originOldProps) {
 
   Object.entries(newProps).forEach(([attr, value]) => {
     if (attr === "className") {
-      target.setAttribute("class", value);
+      target?.setAttribute("class", value);
     } else if (attr.startsWith("on") && typeof value === "function") {
       const eventType = attr.slice(2).toLowerCase();
       /**
@@ -42,7 +42,7 @@ function updateAttributes(target, originNewProps, originOldProps) {
        */
       addEvent(target, eventType, value);
     } else {
-      target.setAttribute(attr, value);
+      target?.setAttribute(attr, value);
     }
   });
 }
@@ -72,7 +72,7 @@ export function updateElement(parentElement, newNode, oldNode, index = 0) {
 
   if (typeof newNode === "string") {
     const textNode = $element;
-    if (textNode.textContent !== newNode) {
+    if (textNode && textNode.textContent !== newNode) {
       textNode.textContent = newNode;
     }
     return;
